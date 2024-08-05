@@ -68,7 +68,7 @@ struct UserProfile: View {
     
     
     private func saveNote() {
-        let follower = Follower(login: username, avatarUrl: "")
+        let _ = Follower(login: username, avatarUrl: "")
         if let existingNote = note {
             existingNote.note = noteText
         } else {
@@ -128,7 +128,7 @@ struct StatsView: View {
         HStack(spacing: 20) {
             StatItemView(title: "Repos", value: "\(user.publicRepos)")
             StatItemView(title: "Following", value: "\(user.following)")
-            StatItemView(title: "Users", value: "\(user.followers)")
+            StatItemView(title: "Followers", value: "\(user.followers)")
         }
     }
 }
