@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="22758" systemVersion="23F79" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
+    <entity name="Note" representedClassName=".Note" syncable="YES">
+        <attribute name="note" optional="YES" attributeType="String" maxValueString="100"/>
+        <attribute name="username" optional="YES" attributeType="String"/>
+    </entity>
+</model>
