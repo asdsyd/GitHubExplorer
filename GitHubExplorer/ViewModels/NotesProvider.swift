@@ -55,7 +55,7 @@ final class NotesProvider {
     }
     
     func createNoteIfNeeded(for follower: Follower) {
-        let fetchRequest: NSFetchRequest<Note> = Note.fetchRequest() as! NSFetchRequest<Note>
+        let fetchRequest: NSFetchRequest<Note> = NSFetchRequest(entityName: "Note")
         fetchRequest.predicate = NSPredicate(format: "username == %@", follower.login)
         
         do {
@@ -73,7 +73,7 @@ final class NotesProvider {
     
     
     func getNoteForUser(_ follower: Follower) -> Note? {
-        let fetchRequest: NSFetchRequest<Note> = Note.fetchRequest() as! NSFetchRequest<Note>
+        let fetchRequest: NSFetchRequest<Note> = NSFetchRequest(entityName: "Note")
         fetchRequest.predicate = NSPredicate(format: "username == %@", follower.login)
         
         do {

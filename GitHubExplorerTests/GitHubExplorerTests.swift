@@ -1,133 +1,136 @@
-////
-////  GitHubExplorerTests.swift
-////  GitHubExplorerTests
-////
-////  Created by Asad Sayeed on 04/08/24.
-////
 //
-//import XCTest
-//import CoreData
-//@testable import GitHubExplorer
+//  GitHubExplorerTests.swift
+//  GitHubExplorerTests
 //
-//class GitHubExplorerTests: XCTestCase {
+//  Created by Asad Sayeed on 04/08/24.
 //
-//    var coreDataStack: CoreDataStack!
-//    var managedContext: NSManagedObjectContext!
-//
-//    override func setUpWithError() throws {
-//        try super.setUpWithError()
-//        coreDataStack = CoreDataStack(modelName: "GitHubExplorer")
-//        managedContext = coreDataStack.managedContext
-//    }
-//
-//    override func tearDownWithError() throws {
-//        managedContext = nil
-//        coreDataStack = nil
-//        try super.tearDownWithError()
-//    }
-//
-//    // MARK: - CoreData Model Tests
-//
-//    func testNoteCreation() {
-//        let note = Note(context: managedContext)
-//        note.note = "Test note"
-//        note.username = "testuser"
-//
-//        XCTAssertNoThrow(try managedContext.save())
-//        XCTAssertEqual(note.note, "Test note")
-//        XCTAssertEqual(note.username, "testuser")
-//    }
-//
-//    func testNoteUpdate() {
-//        let note = Note(context: managedContext)
-//        note.note = "Initial note"
-//        note.username = "testuser"
-//
-//        try? managedContext.save()
-//
-//        note.note = "Updated note"
-//        XCTAssertNoThrow(try managedContext.save())
-//        XCTAssertEqual(note.note, "Updated note")
-//    }
-//
-//    // MARK: - NetworkManager Tests
-//
-//    func testGetFollowers() {
-//        let expectation = XCTestExpectation(description: "Fetch followers")
-//        
-//        NetworkManager.shared.getFollowers(page: 1) { result in
-//            switch result {
-//            case .success(let followers):
-//                XCTAssertFalse(followers.isEmpty)
-//            case .failure(let error):
-//                XCTFail("Failed to fetch followers: \(error.localizedDescription)")
-//            }
-//            expectation.fulfill()
-//        }
-//        
-//        wait(for: [expectation], timeout: 5.0)
-//    }
-//
-//    func testGetUserInfo() {
-//        let expectation = XCTestExpectation(description: "Fetch user info")
-//        
-//        NetworkManager.shared.getUserInfo(for: "octocat") { result in
-//            switch result {
-//            case .success(let user):
-//                XCTAssertEqual(user.login, "octocat")
-//            case .failure(let error):
-//                XCTFail("Failed to fetch user info: \(error.localizedDescription)")
-//            }
-//            expectation.fulfill()
-//        }
-//        
-//        wait(for: [expectation], timeout: 5.0)
-//    }
-//}
-//
-//
-////import XCTest
-////@testable import GitHubExplorer
-////import CoreData
-////
-////final class GitHubExplorerTests: XCTestCase {
-////
-////    override func setUpWithError() throws {
-////        // Put setup code here. This method is called before the invocation of each test method in the class.
-////    }
-////
-////    override func tearDownWithError() throws {
-////        // Put teardown code here. This method is called after the invocation of each test method in the class.
-////    }
-////
-////    func testExample() throws {
-////        // This is an example of a functional test case.
-////        // Use XCTAssert and related functions to verify your tests produce the correct results.
-////        // Any test you write for XCTest can be annotated as throws and async.
-////        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-////        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
-////    }
-////
-////    func testPerformanceExample() throws {
-////        // This is an example of a performance test case.
-////        measure {
-////            // Put the code you want to measure the time of here.
-////        }
-////    }
-////    
-//////    func testUserCreation() {
-//////            let user = User(login: "testUser", avatarUrl: "https://example.com/avatar.jpg", name: "Test User", bio: "Test Bio", publicRepos: 10, followers: 100, following: 50, location: "Test Location", company: "Test Company", email: "test@example.com", createdAt: Date())
-//////            
-//////            XCTAssertEqual(user.login, "testUser")
-//////            XCTAssertEqual(user.avatarUrl, "https://example.com/avatar.jpg")
-//////            XCTAssertEqual(user.name, "Test User")
-//////            XCTAssertEqual(user.bio, "Test Bio")
-//////            XCTAssertEqual(user.publicRepos, 10)
-//////            XCTAssertEqual(user.followers, 100)
-//////            XCTAssertEqual(user.following, 50)
-//////            XCTAssertEqual(user.location, "Test Location")
-//////            XCTAssertEqual(user.company, "Test Company")
-//////            XCTAssertEqual(user.email, "test@example.com")
-//////        }
-////
-////}
+
+
+import XCTest
+@testable import GitHubExplorer
+import CoreData
+
+final class GitHubExplorerTests: XCTestCase {
+    
+    var context: NSManagedObjectContext!
+
+    override func setUpWithError() throws {
+        // Put setup code here. This method is called before the invocation of each test method in the class.
+        try super.setUpWithError()
+        
+        //Initialize an in-memory NSPersistentContainer
+        let persistenContainer = NSPersistentContainer(name: "NotesDataModel")
+        let description = NSPersistentStoreDescription()
+        description.type = NSInMemoryStoreType
+        persistenContainer.persistentStoreDescriptions = [description]
+        
+        persistenContainer.loadPersistentStores { _, error in
+            if let error = error as NSError? {
+                fatalError("Unresolved error \(error), \(error.userInfo)")
+            }
+        }
+        
+        context = persistenContainer.viewContext
+    }
+
+    override func tearDownWithError() throws {
+        // Put teardown code here. This method is called after the invocation of each test method in the class.
+        context = nil
+        try super.tearDownWithError()
+    }
+
+    func testExample() throws {
+        // This is an example of a functional test case.
+        // Use XCTAssert and related functions to verify your tests produce the correct results.
+        // Any test you write for XCTest can be annotated as throws and async.
+        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
+        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
+    }
+
+    func testPerformanceExample() throws {
+        // This is an example of a performance test case.
+        measure {
+            // Put the code you want to measure the time of here.
+        }
+    }
+    
+    
+    //User Tests
+    func testFormattedDateCreatedAt() {
+        let user = User(login: "testUser",
+                        avatarUrl: "https://example.com/avatar.png",
+                        name: nil,
+                        location: nil,
+                        bio: nil,
+                        company: nil,
+                        publicRepos: 0,
+                        publicGists: 0,
+                        htmlUrl: "https://github.com/testuser",
+                        following: 0,
+                        followers: 0,
+                        createdAt: "2023-08-01T00:00:00Z",
+                        email: nil
+        )
+        
+        XCTAssertEqual(user.formattedDateCreatedAt, "1 Aug 2023", "Expected formatted date to be '1 Aug 2023'")
+    }
+    
+    //Note Tests
+    //Testing the creation note
+    func testCreateNote() {
+        let note = Note(context: context)
+        note.note = "This is a test note."
+        note.username = "testuser"
+        
+        do {
+            try context.save()
+        } catch {
+            XCTFail("Failed to save context: \(error)")
+        }
+        
+        let fetchRequest: NSFetchRequest<Note> = NSFetchRequest(entityName: "Note")
+        fetchRequest.predicate = NSPredicate(format: "username == %@", "testuser")
+        do {
+            let notes = try context.fetch(fetchRequest)
+            XCTAssertEqual(notes.count, 1)
+            XCTAssertEqual(notes.first?.note, "This is a test note.")
+            XCTAssertEqual(notes.first?.username, "testuser")
+        } catch {
+            XCTFail("Failed to fetch notes: \(error)")
+        }
+        
+    }
+    
+    
+    //Testing updating the note
+    func testUpdateNote() {
+        let note = Note(context: context)
+        note.note = "This is a test note."
+        note.username = "testuser"
+        
+        do {
+            try context.save()
+        } catch {
+            XCTFail("Failed to save context: \(error)")
+        }
+        
+        note.note = "Updated note."
+        do {
+            try context.save()
+        } catch {
+            XCTFail("Failed to save context: \(error)")
+        }
+        
+        let fetchRequest: NSFetchRequest<Note> = NSFetchRequest(entityName: "Note")
+        fetchRequest.predicate = NSPredicate(format: "username == %@", "testuser")
+        do {
+            let notes = try context.fetch(fetchRequest)
+            XCTAssertEqual(notes.count, 1)
+            XCTAssertEqual(notes.first?.note, "Updated note.")
+            XCTAssertEqual(notes.first?.username, "testuser")
+        } catch {
+            XCTFail("Failed to fetch notes: \(error)")
+        }
+    }
+
+}
