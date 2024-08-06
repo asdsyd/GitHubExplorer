@@ -24,27 +24,27 @@ class FollowerListVC: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        configureViewController()
-        configureSearchController()
-        configureCollectionView()
-        getFollowers(page: 1)
-        configureDataSource()
+        configureViewController() //Set up the view controller appearance.
+        configureSearchController() //Set up the search controller.
+        configureCollectionView() //Set up the collection view layout and appearance
+        getFollowers(page: 1) //Fetch initial followers
+        configureDataSource() //Set up the data source for the collection view
     }
     
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.isNavigationBarHidden = false
-        collectionView.reloadData()
+        collectionView.reloadData() //Reload the collection view data to update the notes icon
     }
     
-    
+    //Configure the main view controller properties
     func configureViewController() {
         view.backgroundColor = .systemBackground
         navigationController?.isNavigationBarHidden = false
     }
     
-    
+    //Configure the collection view
     func configureCollectionView() {
         collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: UIHelper.createSingleColumnFlowLayout(in: view))
         view.addSubview(collectionView)
@@ -53,7 +53,7 @@ class FollowerListVC: UIViewController {
         collectionView.register(FollowerCell.self, forCellWithReuseIdentifier: FollowerCell.reuseID)
     }
     
-    
+    // Congfiure the search controller for searching followers
     func configureSearchController() {
         let searchController = UISearchController()
         searchController.searchResultsUpdater = self
@@ -62,7 +62,7 @@ class FollowerListVC: UIViewController {
         navigationItem.searchController = searchController
     }
     
-    
+    // fetch list of users from the github api in this case it is being named as "Followers"
     func getFollowers(page: Int) {
         showLoadingView()
         NetworkManager.shared.getFollowers(page: page) { [weak self] result in
@@ -82,7 +82,7 @@ class FollowerListVC: UIViewController {
         }
     }
     
-    
+    // configure teh data source for the collection view
     func configureDataSource() {
         dataSource = UICollectionViewDiffableDataSource<Section, Follower>(collectionView: collectionView, cellProvider: { (collectionView, indexPath, follower) -> UICollectionViewCell? in
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FollowerCell.reuseID, for: indexPath) as! FollowerCell
@@ -104,7 +104,7 @@ class FollowerListVC: UIViewController {
         })
     }
     
-    
+    // update the data in the collection view
     func updateData(on followers : [Follower]) {
         var snapshot = NSDiffableDataSourceSnapshot<Section, Follower>()
         snapshot.appendSections([.main])
@@ -116,6 +116,7 @@ class FollowerListVC: UIViewController {
 
 extension FollowerListVC: UICollectionViewDelegate {
     
+    // handle the scolling to load more github users
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         let offsetY = scrollView.contentOffset.y
         let contentHeight = scrollView.contentSize.height
@@ -128,7 +129,7 @@ extension FollowerListVC: UICollectionViewDelegate {
         }
     }
     
-    
+    // handle the selection of a github user ( follower )
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let activeArray = isSearching ? filteredFollowers : followers
         let follower = activeArray[indexPath.item]
@@ -138,6 +139,7 @@ extension FollowerListVC: UICollectionViewDelegate {
         
     }
     
+    // update search results based on the search text
     func updateSearchResults(for searchController: UISearchController) {
         guard let filter = searchController.searchBar.text, !filter.isEmpty else {
             isSearching = false
@@ -155,6 +157,7 @@ extension FollowerListVC: UICollectionViewDelegate {
         updateData(on: filteredFollowers)
     }
     
+    // reload the data in the collection view : used for providing the notes icon
     func reloadData() {
         updateData(on: isSearching ? filteredFollowers : followers)
     }
@@ -162,20 +165,8 @@ extension FollowerListVC: UICollectionViewDelegate {
 
 
 extension FollowerListVC: UISearchResultsUpdating, UISearchBarDelegate {
-//    func updateSearchResults(for searchController: UISearchController) {
-//        guard let filter = searchController.searchBar.text, !filter.isEmpty else { return }
-//        isSearching = true
-//        filteredFollowers = followers.filter { follower in
-////            $0.login.lowercased().contains(filter.lowercased())
-//            let matchesUsername = follower.login.lowercased().contains(filter.lowercased())
-//            let matchesNote = NotesProvider.shared.getNoteForUser(
-//                Follower(login: follower.login, avatarUrl: follower.avatarUrl))?.note.lowercased().contains(filter.lowercased()) ?? false
-//            return matchesUsername || matchesNote
-//        }
-//        updateData(on: filteredFollowers)
-//    }
     
-    
+    // handle cancel button in the serach bar
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         isSearching = false
         updateData(on: followers)
