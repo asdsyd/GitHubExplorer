@@ -1,4 +1,6 @@
 # GitHubExplorer
+## Screenshots:
+![GitHubExplorer](https://github.com/user-attachments/assets/ca0455af-7bb3-4e66-a554-7fbbab6aebe2)
 
 ## Requirements:
 - Latest Xcode 15.4
