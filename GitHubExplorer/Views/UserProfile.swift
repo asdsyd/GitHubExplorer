@@ -15,7 +15,7 @@ struct UserProfile: View {
     @State private var showingAlert = false
     @State private var alertTitle = ""
     @State private var alertMessage = ""
-    @FocusState private var isTextFieldFocused: Bool
+    
     
     var body: some View {
         ScrollView {
@@ -26,7 +26,11 @@ struct UserProfile: View {
                     ProfileInfoView(user: user)
                     UserSinceView(user: user)
                     Spacer()
-                    NoteView(noteText: $noteText, isTextFieldFocused: _isTextFieldFocused, onSubmit: saveNote)
+                    if #available(iOS 15.0, *) {
+                        NoteView(noteText: $noteText, onSubmit: saveNote)
+                    } else {
+                        LegacyNoteView(noteText: $noteText, onSubmit: saveNote)
+                    }
                     Spacer()
                 } else {
                     ProgressView()
@@ -96,13 +100,20 @@ struct ProfileHeaderView: View {
     
     var body: some View {
         VStack {
-            AsyncImage(url: URL(string: user.avatarUrl)) { image in
-                image
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 100, height: 100)
-                    .clipShape(RoundedRectangle(cornerRadius: 25.0))
-            } placeholder: {
+            if #available(iOS 15.0, *) {
+                AsyncImage(url: URL(string: user.avatarUrl)) { image in
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 100, height: 100)
+                        .clipShape(RoundedRectangle(cornerRadius: 25.0))
+                } placeholder: {
+                    Image(systemName: "person.circle.fill")
+                        .resizable()
+                        .frame(width: 100, height: 100)
+                }
+            } else {
+                //Placeholder for iOS 14
                 Image(systemName: "person.circle.fill")
                     .resizable()
                     .frame(width: 100, height: 100)
@@ -114,7 +125,7 @@ struct ProfileHeaderView: View {
             
             Text(user.bio ?? "Empty Bio")
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
         }
     }
@@ -143,7 +154,7 @@ struct StatItemView: View {
                 .font(.headline)
             Text(title)
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundColor(.secondary)
         }
     }
 }
@@ -171,7 +182,7 @@ struct InfoRowView: View {
     var body: some View {
         HStack(alignment: .top, spacing: 10) {
             Image(systemName: icon)
-                .foregroundStyle(.secondary)
+                .foregroundColor(.secondary)
                 .frame(width: 20, alignment: .center)
             Text(text)
                 .multilineTextAlignment(.leading)
@@ -188,12 +199,12 @@ struct UserSinceView: View {
         VStack(alignment: .center) {
             Text("User since: \(user.formattedDateCreatedAt)")
                 .font(.footnote)
-                .foregroundStyle(.secondary)
+                .foregroundColor(.secondary)
         }
     }
 }
 
-
+@available(iOS 15.0, *)
 struct NoteView: View {
     @Binding var noteText: String
     @FocusState var isTextFieldFocused: Bool
@@ -201,8 +212,7 @@ struct NoteView: View {
     
     var body: some View {
         VStack {
-            TextField("Tap to add a note", text: $noteText, axis: .vertical)
-                .lineLimit(5...10)
+            TextField("Tap to add a note", text: $noteText)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
                 .focused($isTextFieldFocused)
@@ -210,6 +220,23 @@ struct NoteView: View {
                     onSubmit()
                     isTextFieldFocused = false
                 }
+        }
+    }
+}
+
+
+struct LegacyNoteView: View {
+    @Binding var noteText: String
+    var onSubmit: () -> Void
+    
+    var body: some View {
+        VStack {
+            TextField("Tap to add note", text: $noteText)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .padding()
+            Button("Save Note") {
+                onSubmit()
+            }
         }
     }
 }
